@@ -1,0 +1,33 @@
+datasource db {
+  provider = "postgresql" //
+  url      = env("DATABASE_URL")
+  // shadowDatabaseUrl = env("SHADOW_DATABASE_URL") // para migrações sem lock em produção
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+//----------------------------------------- MODELS -------------------------------------------------------
+model User {
+  id        Int      @id @default(autoincrement())
+  username  String
+  email     String   @unique 
+  password  String   
+  isActive  Boolean  @default(true) 
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt
+
+  @@map("users")
+}
+
+model Product {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  price       Float
+  quantity    Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  @@map("products")
+}
