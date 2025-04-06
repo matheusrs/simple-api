@@ -1,8 +1,6 @@
-// src/config/swagger.ts
+import swaggerJsDoc, { Options } from "swagger-jsdoc";
 
-import swaggerJSDoc from "swagger-jsdoc";
-
-const swaggerOptions = {
+const swaggerOptions: Options = {
   definition: {
     openapi: "3.0.0",
     info: {
@@ -16,11 +14,25 @@ const swaggerOptions = {
         url: "http://localhost:3000",
       },
     ],
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: "http",
+          scheme: "bearer",
+          bearerFormat: "JWT",
+        },
+      },
+    },
+    // Aplica o esquema de segurança globalmente (pode ser sobrescrito por rota)
+    security: [
+      {
+        bearerAuth: [],
+      },
+    ],
   },
-  // Caminho para os arquivos que contêm anotações do Swagger (rotas, controllers, etc.)
   apis: ["./src/routes/*.ts", "./src/controllers/*.ts"],
 };
 
-const swaggerSpecs = swaggerJSDoc(swaggerOptions);
+const swaggerSpecs = swaggerJsDoc(swaggerOptions);
 
 export default swaggerSpecs;
