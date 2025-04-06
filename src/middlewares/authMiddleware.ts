@@ -1,24 +1,34 @@
 import { Request, Response, NextFunction } from "express";
+import jwt from "jsonwebtoken";
+
+const ACCESS_TOKEN_SECRET =
+  process.env.ACCESS_TOKEN_SECRET || "fallback_access_token_secret";
 
 export const authMiddleware = (
   req: Request,
   res: Response,
   next: NextFunction
 ): void => {
-  const token = req.headers.authorization;
+  const authHeader = req.headers.authorization;
 
-  if (!token) {
+  if (!authHeader) {
     res.status(401).json({ error: "Token não fornecido" });
     return;
   }
 
-  // Aqui você pode implementar a lógica para decodificar e validar o token
-  // Exemplo simplificado:
-  if (token !== "seu-token-esperado") {
-    res.status(401).json({ error: "Token inválido" });
+  const token = authHeader.split(" ")[1];
+  if (!token) {
+    res.status(401).json({ error: `Token inválido` });
     return;
   }
 
-  // Se o token for válido, permite que a requisição prossiga
-  next();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  jwt.verify(token, ACCESS_TOKEN_SECRET, (err, _decoded) => {
+    if (err) {
+      res.status(403).json({ error: `Token inválido ou expirado ${err}` });
+      return;
+    }
+    // req.user = decoded;
+    next();
+  });
 };
